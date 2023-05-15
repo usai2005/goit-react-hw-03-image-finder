@@ -4,7 +4,7 @@ import { Loader } from './Loader/Loader';
 import { Searchbar } from './Searchbar/Searchbar';
 import { ImageGallery } from './ImageGallery/ImageGallery';
 import { LoadMoreBtn } from './LoadMoreBtn/LoadMoreBtn';
-import { ApiRequest } from './Api/ApiRequest';
+import { ApiRequest } from '../Api/ApiRequest';
 import 'react-toastify/dist/ReactToastify.css';
 
 export class App extends Component {
@@ -22,7 +22,7 @@ export class App extends Component {
       prevState.searchQuery !== this.state.searchQuery ||
       prevState.page !== this.state.page
     ) {
-      this.setState({ loading: true });
+      this.setState({ loading: true, existImagesToShow: false });
 
       ApiRequest(this.state.searchQuery, this.state.page)
         .then(result => {
@@ -50,6 +50,11 @@ export class App extends Component {
               });
             }
           } else {
+            this.setState(prevState => ({
+              foundImages: [...prevState.foundImages, ...result.hits],
+              existImagesToShow: true,
+            }));
+
             if (
               this.state.page ===
               Math.ceil(
@@ -59,9 +64,6 @@ export class App extends Component {
             ) {
               this.setState({ existImagesToShow: false });
             }
-            this.setState(prevState => ({
-              foundImages: [...prevState.foundImages, ...result.hits],
-            }));
           }
         })
         .catch(error => console.log(error))
